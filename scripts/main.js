@@ -1,7 +1,8 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
-var { Router, Route, Navigation } = require('react-router');
+var { Router, Route, browserHistory, withRouter } = require('react-router');
 var createBrowserHistory = require('history/lib/createBrowserHistory');
+var h = require('./helpers');
 
 // ----------------
 var App = React.createClass({
@@ -58,16 +59,23 @@ var Inventory = React.createClass({
 
 // ----------------
 var StorePicker = React.createClass({
+  getToStore: function(event) {
+    event.preventDefault();
+    var storeId = this.refs.storeId.value;
+    this.props.router.push(`/store/${storeId}`);
+  },
   render: function() {
     return (
-     <form className="store-selector">
+     <form className="store-selector" onSubmit={this.getToStore}>
       <h2>Please Enter A Store</h2>
-      <input type="text" ref="storeId" required/>
+      <input type="text" ref="storeId" defaultValue={h.getFunName()} required/>
       <input type="submit"/>
      </form>
     );
   }
 });
+
+StorePicker = withRouter(StorePicker);
 
 // ----------------
 var NotFound = React.createClass({
@@ -80,7 +88,7 @@ var NotFound = React.createClass({
 
 // ----------------
 var routes = (
-  <Router history={createBrowserHistory()}>
+  <Router history={browserHistory}>
     <Route path="/" component={StorePicker}/>
     <Route path="store/:storeId" component={App}/>
     <Route path="*" component={NotFound}/>
