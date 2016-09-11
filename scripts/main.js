@@ -24,9 +24,9 @@ var App = React.createClass({
     });
   },
   addToOrder: function(fish) {
-    var orders  = this.state.order;
+    var order = this.state.order;
     this.setState({
-      order: {...orders, [fish]: orders[fish] + 1 || 1}
+      order: {...order, [fish]: order[fish] + 1 || 1}
     });
   },
   renderFish: function(fish) {
@@ -35,17 +35,38 @@ var App = React.createClass({
     );
   },
   render: function() {
+    var { fishes, order } = this.state;
     return (
       <div className="catch-of-the-day">
         <div className="menu">
           <Header tagline="Fresh Seafood Market"/>
           <ul className="list-of-fishes">
-            {Object.keys(this.state.fishes).map(this.renderFish)}
+            {Object.keys(fishes).map(this.renderFish)}
           </ul>
         </div>
-        <Order/>
+        <Order fishes={fishes} order={order}/>
         <Inventory addFish={this.addFish} loadSamples={this.loadSamples}/>
       </div>
+    );
+  }
+});
+
+// ----------------
+var Header = React.createClass({
+  render: function() {
+    const { tagline } = this.props;
+    return (
+      <header className="top">
+        <h1>
+          Catch
+          <span className="ofThe">
+            <span className="of">of</span>
+            <span className="the">the</span>
+          </span>
+          Day
+        </h1>
+        <h3 className="tagline"><span>{tagline}</span></h3>
+      </header>
     );
   }
 });
@@ -55,7 +76,6 @@ var Fish = React.createClass({
   onButtonClick: function() {
     this.props.addToOrder(this.props.index);
   },
-  
   render: function() {
     var { name, price, status, desc, image } = this.props.details;
     var isAvailable = status === 'available' ? true : false;
@@ -73,6 +93,71 @@ var Fish = React.createClass({
     );
   }
 });
+
+// ----------------
+var Order = React.createClass({
+  renderOrder: function(key) {
+    var fish = this.props.fishes[key];
+    var count = this.props.order[key];
+    
+    if (!fish) {
+      return (
+        <li key={key}>Sorry, fish no longer available!</li>
+      );
+    }
+    
+    return (
+      <li key={key}>
+        {count}lbs
+        {fish.name}
+        <span className="price">{h.formatPrice(count * fish.price)}</span>
+      </li>
+    );
+  },
+  render: function() {
+    var { fishes, order } = this.props;
+    var orderKeys = Object.keys(order);
+    
+    var total = orderKeys.reduce((prevTotal, key) => {
+      var fish = fishes[key];
+      var count = order[key];
+      var isAvailable = fish && fish.status === 'available';
+      
+      if (fish && isAvailable) {
+        return prevTotal + (count * parseInt(fish.price) || 0);
+      } else {
+        return prevTotal;
+      }
+    }, 0);
+    
+    return (
+      <div className="order-wrap">
+        <h2 className="order-title">Your order</h2>
+        <ul className="order">
+          {orderKeys.map(this.renderOrder)}
+          <li className="total">
+            <strong>Total:</strong>
+            {h.formatPrice(total)}
+          </li>
+        </ul>
+      </div>
+    );
+  }
+});
+
+// ----------------
+var Inventory = React.createClass({
+  render: function() {
+    return (
+      <div>
+        <h2>Inventory</h2>
+        <AddFishForm {...this.props}/>
+        <button onClick={this.props.loadSamples}>Load Sample Fishes</button>
+      </div>
+    );
+  }
+});
+
 
 // ----------------
 var AddFishForm = React.createClass({
@@ -104,48 +189,6 @@ var AddFishForm = React.createClass({
       <input type="text" ref="image" placeholder="URL to Image"/>
       <button type="submit">+ Add Item </button>
      </form>
-    );
-  }
-});
-
-// ----------------
-var Header = React.createClass({
-  render: function() {
-    const { tagline } = this.props;
-    return (
-      <header className="top">
-        <h1>
-          Catch
-          <span className="ofThe">
-            <span className="of">of</span>
-            <span className="the">the</span>
-          </span>
-          Day
-        </h1>
-        <h3 className="tagline"><span>{tagline}</span></h3>
-      </header>
-    );
-  }
-});
-
-// ----------------
-var Order = React.createClass({
-  render: function() {
-    return (
-      <p>Order</p>
-    );
-  }
-});
-
-// ----------------
-var Inventory = React.createClass({
-  render: function() {
-    return (
-      <div>
-        <h2>Inventory</h2>
-        <AddFishForm {...this.props}/>
-        <button onClick={this.props.loadSamples}>Load Sample Fishes</button>
-      </div>
     );
   }
 });
