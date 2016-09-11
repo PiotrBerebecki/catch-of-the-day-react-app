@@ -23,9 +23,15 @@ var App = React.createClass({
       fishes: require('./sample-fishes')
     });
   },
+  addToOrder: function(fish) {
+    var orders  = this.state.order;
+    this.setState({
+      order: {...orders, [fish]: orders[fish] + 1 || 1}
+    });
+  },
   renderFish: function(fish) {
     return (
-      <Fish key={fish} index={fish} details={this.state.fishes[fish]}/>
+      <Fish key={fish} index={fish} details={this.state.fishes[fish]} addToOrder={this.addToOrder}/>
     );
   },
   render: function() {
@@ -46,8 +52,14 @@ var App = React.createClass({
 
 // ----------------
 var Fish = React.createClass({
+  onButtonClick: function() {
+    this.props.addToOrder(this.props.index);
+  },
+  
   render: function() {
     var { name, price, status, desc, image } = this.props.details;
+    var isAvailable = status === 'available' ? true : false;
+    var buttonText = isAvailable ? 'Add to Order' : 'Sold Out!';
     return (
       <li className="menu-fish">
         <img src={image} alt={image}/>
@@ -56,6 +68,7 @@ var Fish = React.createClass({
           <span className="price">{h.formatPrice(price)}</span>
         </h3>
         <p>{desc}</p>
+        <button disabled={!isAvailable} onClick={this.onButtonClick}>{buttonText}</button>
       </li>
     );
   }
