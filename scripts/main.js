@@ -19,6 +19,17 @@ var App = React.createClass({
       context: this,
       state: 'fishes'
     });
+    
+    var localStorageOrder = localStorage.getItem(`order-${this.props.params.storeId}`);
+    
+    if (localStorageOrder) {
+      this.setState({
+        order: JSON.parse(localStorageOrder)
+      });
+    }
+  },
+  componentWillUpdate: function(nextProps, nextState) {
+    localStorage.setItem(`order-${this.props.params.storeId}`, JSON.stringify(nextState.order));
   },
   addFish: function(fish) { 
     var timestamp = (new Date()).getTime();
@@ -108,6 +119,12 @@ var Order = React.createClass({
     var fish = this.props.fishes[key];
     var count = this.props.order[key];
     
+    if (Object.keys(this.props.fishes).length === 0) {
+      return (
+        <li key={key}>Loading item...</li>
+      );
+    }    
+
     if (!fish) {
       return (
         <li key={key}>Sorry, fish no longer available!</li>
