@@ -1,11 +1,14 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
+var CSSTransitionGroup = require('react-addons-css-transition-group');
+
 var { Router, Route, browserHistory, withRouter } = require('react-router');
 var createBrowserHistory = require('history/lib/createBrowserHistory');
 var h = require('./helpers');
 var Rebase = require('re-base');
 var base = Rebase.createClass({databaseURL: 'https://catch-of-the-day-react-app.firebaseio.com/'});
 var Catalyst = require('react-catalyst');
+
 
 // ----------------
 var App = React.createClass({
@@ -156,10 +159,16 @@ var Order = React.createClass({
     
     return (
       <li key={key}>
-        {count}lbs&nbsp;
-        {fish.name}
+        <span>
+          <CSSTransitionGroup component="span"
+                              transitionName="count"
+                              transitionEnterTimeout={250}
+                              transitionLeaveTimeout={250}>
+            <span key={count}>{count}</span>
+          </CSSTransitionGroup>
+          lbs {fish.name} {removeButton}
+        </span>
         <span className="price">{h.formatPrice(count * fish.price)}</span>
-        {removeButton}
       </li>
     );
   },
@@ -182,13 +191,19 @@ var Order = React.createClass({
     return (
       <div className="order-wrap">
         <h2 className="order-title">Your order</h2>
-        <ul className="order">
+        
+        <CSSTransitionGroup className="order"
+                            component="ul"
+                            transitionName="order"
+                            transitionEnterTimeout={500}
+                            transitionLeaveTimeout={500}>
           {orderKeys.map(this.renderOrder)}
           <li className="total">
             <strong>Total:</strong>
             {h.formatPrice(total)}
           </li>
-        </ul>
+        </CSSTransitionGroup>
+        
       </div>
     );
   }
@@ -198,7 +213,6 @@ var Order = React.createClass({
 var Inventory = React.createClass({
   renderInventory: function(key) {
     var { linkState, removeFish } = this.props;
-
     return (
       <div className="fish-edit" key={key}>
         <input type="text" valueLink={linkState(`fishes.${key}.name`)}/>

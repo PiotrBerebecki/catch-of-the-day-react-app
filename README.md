@@ -17,5 +17,6 @@ The technologies used include:
 * Mocha
 * Firebase
 * OAuth
+* Stylus (CSS preprocessor)
 * Git
 * GitHub
