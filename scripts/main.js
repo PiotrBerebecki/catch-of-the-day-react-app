@@ -4,7 +4,7 @@ var { Router, Route, browserHistory, withRouter } = require('react-router');
 var createBrowserHistory = require('history/lib/createBrowserHistory');
 var h = require('./helpers');
 var Rebase = require('re-base');
-var base = Rebase.createClass('https://catch-of-the-day-react-app.firebaseio.com/');
+var base = Rebase.createClass({databaseURL: 'https://catch-of-the-day-react-app.firebaseio.com/'});
 var Catalyst = require('react-catalyst');
 
 // ----------------
@@ -19,7 +19,7 @@ var App = React.createClass({
   componentDidMount: function() {
     base.syncState(`${this.props.params.storeId}/fishes`, {
       context: this,
-      state: 'fishes'
+      state: 'fishes',
     });
     
     var localStorageOrder = localStorage.getItem(`order-${this.props.params.storeId}`);
@@ -33,21 +33,35 @@ var App = React.createClass({
   componentWillUpdate: function(nextProps, nextState) {
     localStorage.setItem(`order-${this.props.params.storeId}`, JSON.stringify(nextState.order));
   },
+  addToOrder: function(fish) {
+    var order = this.state.order;
+    this.setState({
+      order: {...order, [fish]: order[fish] + 1 || 1}
+    });
+  },
+  removeFromOrder: function(key) {    
+    var orderCopy = Object.assign({}, this.state.order);
+    delete orderCopy[key];
+    this.setState({
+      order: {...orderCopy}
+    });
+  },
   addFish: function(fish) { 
     var timestamp = (new Date()).getTime();
     this.setState({
       fishes: {...this.state.fishes, [`fish-${timestamp}`]: fish}
     });
   },
+  removeFish: function(key) {  
+    if (confirm('Are you sure you want to remove this fish?')) {
+      this.setState({
+        fishes: {[key]: null}
+      });
+    }
+  },
   loadSamples: function() {
     this.setState({
       fishes: require('./sample-fishes')
-    });
-  },
-  addToOrder: function(fish) {
-    var order = this.state.order;
-    this.setState({
-      order: {...order, [fish]: order[fish] + 1 || 1}
     });
   },
   renderFish: function(fish) {
@@ -65,8 +79,11 @@ var App = React.createClass({
             {Object.keys(fishes).map(this.renderFish)}
           </ul>
         </div>
-        <Order fishes={fishes} order={order}/>
+        <Order fishes={fishes}
+               order={order}
+               removeFromOrder={this.removeFromOrder}/>
         <Inventory addFish={this.addFish}
+                   removeFish={this.removeFish}
                    loadSamples={this.loadSamples}
                    linkState={this.linkState}
                    fishes={this.state.fishes}/>
@@ -123,6 +140,7 @@ var Order = React.createClass({
   renderOrder: function(key) {
     var fish = this.props.fishes[key];
     var count = this.props.order[key];
+    var removeButton = <button onClick={this.props.removeFromOrder.bind(null, key)}>&times;</button>;
     
     if (Object.keys(this.props.fishes).length === 0) {
       return (
@@ -132,15 +150,16 @@ var Order = React.createClass({
 
     if (!fish) {
       return (
-        <li key={key}>Sorry, fish no longer available!</li>
+        <li key={key}>Sorry, fish no longer available! {removeButton}</li>
       );
     }
     
     return (
       <li key={key}>
-        {count}lbs
+        {count}lbs&nbsp;
         {fish.name}
         <span className="price">{h.formatPrice(count * fish.price)}</span>
+        {removeButton}
       </li>
     );
   },
@@ -178,7 +197,7 @@ var Order = React.createClass({
 // ----------------
 var Inventory = React.createClass({
   renderInventory: function(key) {
-    var { linkState } = this.props;
+    var { linkState, removeFish } = this.props;
 
     return (
       <div className="fish-edit" key={key}>
@@ -190,6 +209,7 @@ var Inventory = React.createClass({
         </select>
         <textarea valueLink={linkState(`fishes.${key}.desc`)}></textarea>
         <input type="text" valueLink={linkState(`fishes.${key}.image`)}/>
+        <button onClick={this.props.removeFish.bind(null, key)}>Remove Fish</button>
       </div>
     );
   },
