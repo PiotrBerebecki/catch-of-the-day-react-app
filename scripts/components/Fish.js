@@ -1,11 +1,17 @@
 import React from 'react';
 import helpers from'../helpers';
 
-var Fish = React.createClass({
-  onButtonClick: function() {
+class Fish extends React.Component {
+  constructor() {
+    super();
+    this.onButtonClick = this.onButtonClick.bind(this);
+  }
+  
+  onButtonClick() {
     this.props.addToOrder(this.props.index);
-  },
-  render: function() {
+  }
+  
+  render() {
     var { name, price, status, desc, image } = this.props.details;
     var isAvailable = status === 'available' ? true : false;
     var buttonText = isAvailable ? 'Add to Order' : 'Sold Out!';
@@ -21,6 +27,11 @@ var Fish = React.createClass({
       </li>
     );
   }
-});
+}
+
+Fish.propTypes = {
+  addToOrder: React.PropTypes.func.isRequired,
+  details: React.PropTypes.object.isRequired
+};
 
 export default Fish;

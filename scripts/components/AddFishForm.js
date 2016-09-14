@@ -1,7 +1,12 @@
 import React from 'react';
 
-var AddFishForm = React.createClass({
-  createFish: function(event) {
+class AddFishForm extends React.Component {
+  constructor() {
+    super();
+    this.createFish = this.createFish.bind(this);
+  }
+  
+  createFish(event) {
     event.preventDefault();
     
     var fish = {
@@ -15,8 +20,9 @@ var AddFishForm = React.createClass({
     this.props.addFish(fish);
     
     this.refs.fishForm.reset();
-  },
-  render: function() {
+  }
+  
+  render() {
     return (
      <form className="fish-edit" ref="fishForm" onSubmit={this.createFish}>
       <input type="text" ref="name" placeholder="Fish Name"/>
@@ -31,6 +37,10 @@ var AddFishForm = React.createClass({
      </form>
     );
   }
-});
+}
+
+AddFishForm.propTypes = {
+  addFish: React.PropTypes.func.isRequired
+};
 
 export default AddFishForm;

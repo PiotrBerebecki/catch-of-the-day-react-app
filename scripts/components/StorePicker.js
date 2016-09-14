@@ -2,13 +2,19 @@ import React from 'react';
 import { withRouter } from 'react-router';
 import helpers from'../helpers';
 
-var StorePicker = React.createClass({
-  getToStore: function(event) {
+class StorePicker extends React.Component {
+  constructor() {
+    super();
+    this.getToStore = this.getToStore.bind(this);
+  }
+     
+  getToStore(event) {
     event.preventDefault();
     var storeId = this.refs.storeId.value;
     this.props.router.push(`/store/${storeId}`);
-  },
-  render: function() {
+  }
+  
+  render() {
     return (
      <form className="store-selector" onSubmit={this.getToStore}>
       <h2>Please Enter A Store</h2>
@@ -17,6 +23,10 @@ var StorePicker = React.createClass({
      </form>
     );
   }
-});
+}
+
+StorePicker.propTypes = {
+  router: React.PropTypes.object.isRequired
+};
 
 export default withRouter(StorePicker);

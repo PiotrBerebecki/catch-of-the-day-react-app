@@ -2,8 +2,13 @@ import React from 'react';
 import AddFishForm from './AddFishForm';
 
 // ----------------
-var Inventory = React.createClass({
-  renderInventory: function(key) {
+class Inventory extends React.Component {
+  constructor() {
+    super();
+    this.renderInventory = this.renderInventory.bind(this);
+  }
+  
+  renderInventory(key) {
     var { linkState } = this.props;
     return (
       <div className="fish-edit" key={key}>
@@ -18,8 +23,9 @@ var Inventory = React.createClass({
         <button onClick={this.props.removeFish.bind(null, key)}>Remove Fish</button>
       </div>
     );
-  },
-  render: function() {
+  }
+  
+  render() {
     return (
       <div>
         <h2>Inventory</h2>
@@ -28,14 +34,15 @@ var Inventory = React.createClass({
         <button onClick={this.props.loadSamples}>Load Sample Fishes</button>
       </div>
     );
-  },
-  propTypes: {
-    addFish: React.PropTypes.func.isRequired,
-    removeFish: React.PropTypes.func.isRequired,
-    loadSamples: React.PropTypes.func.isRequired,
-    linkState: React.PropTypes.func.isRequired,
-    fishes: React.PropTypes.object.isRequired
   }
-});
+}
+
+Inventory.propTypes = {
+  addFish: React.PropTypes.func.isRequired,
+  removeFish: React.PropTypes.func.isRequired,
+  loadSamples: React.PropTypes.func.isRequired,
+  linkState: React.PropTypes.func.isRequired,
+  fishes: React.PropTypes.object.isRequired
+};
 
 export default Inventory;
