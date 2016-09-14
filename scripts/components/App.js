@@ -6,11 +6,7 @@ import Header from './Header';
 import Fish from './Fish';
 import Order from './Order';
 import Inventory from './Inventory';
-
-// Firebase
-import Rebase from 're-base';
-import { firebaseURL } from '../firebaseConfig';
-var base = Rebase.createClass({databaseURL: firebaseURL});
+import { base } from '../firebaseConfig';
 
 class App extends React.Component {
   constructor() {

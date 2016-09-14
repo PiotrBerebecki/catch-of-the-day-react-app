@@ -1,7 +1,6 @@
 import React from 'react';
 import AddFishForm from './AddFishForm';
-import firebase,
-       { 
+import { base,
          githubProvider,
          facebookProvider,
          twitterProvider
@@ -18,7 +17,7 @@ class Inventory extends React.Component {
   }
   
   authenticate(provider) {
-    firebase.auth().signInWithPopup(provider);
+    base.auth().signInWithPopup(provider);
   }
   
   renderLogin() {
