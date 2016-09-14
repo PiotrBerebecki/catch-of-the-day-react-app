@@ -8,7 +8,7 @@
   },
   "main": "index.js",
   "scripts": {
-    "build": "gulp",
+    "postinstall": "gulp",
     "start": "node gulpfile.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
