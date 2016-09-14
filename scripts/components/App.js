@@ -9,7 +9,8 @@ import Inventory from './Inventory';
 
 // Firebase
 import Rebase from 're-base';
-var base = Rebase.createClass({databaseURL: 'https://catch-of-the-day-react-app.firebaseio.com/'});
+import { firebaseURL } from '../firebaseConfig';
+var base = Rebase.createClass({databaseURL: firebaseURL});
 
 class App extends React.Component {
   constructor() {

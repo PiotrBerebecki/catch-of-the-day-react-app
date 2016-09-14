@@ -1,15 +1,48 @@
 import React from 'react';
 import AddFishForm from './AddFishForm';
+import firebase,
+       { 
+         githubProvider,
+         facebookProvider,
+         twitterProvider
+       } from '../firebaseConfig';
 
-// ----------------
 class Inventory extends React.Component {
   constructor() {
     super();
+    this.state = {
+      uid: ''
+    };
     this.renderInventory = this.renderInventory.bind(this);
+    this.renderLogin = this.renderLogin.bind(this);
+  }
+  
+  authenticate(provider) {
+    firebase.auth().signInWithPopup(provider);
+  }
+  
+  renderLogin() {
+    return (
+      <nav className="login">
+        <h2>Inventory</h2>
+        <button className="github"
+                onClick={this.authenticate.bind(this, githubProvider)}>
+          Log in with Github
+        </button>
+        <button className="facebook"
+                onClick={this.authenticate.bind(this, facebookProvider)}>
+          Log in with Facebook
+        </button>
+        <button className="twitter"
+                onClick={this.authenticate.bind(this, twitterProvider)}>
+          Log in with Twitter
+        </button>
+      </nav>
+    );
   }
   
   renderInventory(key) {
-    var { linkState } = this.props;
+    var { linkState } = this.props;   
     return (
       <div className="fish-edit" key={key}>
         <input type="text" valueLink={linkState(`fishes.${key}.name`)}/>
@@ -26,10 +59,32 @@ class Inventory extends React.Component {
   }
   
   render() {
+    let logoutButton = <button>Log Out!</button>;
+    
+    // check if user is logged in
+    if (!this.state.uui) {
+      return (
+        <div>{this.renderLogin()}</div>
+      );
+    }
+    
+    // check if user owns the store
+    if (this.state.uid !== this.state.owner) {
+      return (
+        <div>
+          <p>Sorry, you aren't the owner of this store</p>
+          {logoutButton}
+        </div>
+      );
+    }
+    
     return (
       <div>
         <h2>Inventory</h2>
+        {logoutButton}
+        
         {Object.keys(this.props.fishes).map(this.renderInventory)}
+        
         <AddFishForm {...this.props}/>
         <button onClick={this.props.loadSamples}>Load Sample Fishes</button>
       </div>
