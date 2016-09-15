@@ -1,6 +1,7 @@
 import React from 'react';
 import AddFishForm from './AddFishForm';
 import { base,
+         firebaseRef,
          githubProvider,
          facebookProvider,
          twitterProvider
@@ -10,15 +11,69 @@ class Inventory extends React.Component {
   constructor() {
     super();
     this.state = {
-      uid: ''
+      uid: '',
+      owner: ''
     };
     this.renderInventory = this.renderInventory.bind(this);
     this.renderLogin = this.renderLogin.bind(this);
+    this.logout = this.logout.bind(this);
+  }
+  
+  componentWillMount() {
+  
+    base.auth().onAuthStateChanged((user) => {
+      if (user) {  
+        this.setState({
+          uid: user.uid,
+          owner: this.state.owner || user.uid
+        });
+        console.log('User is signed in wow', this.state.uid);
+      } else {
+        this.setState({
+          uid: null
+        });
+        console.log('User is signed out wow', this.state.uid);
+      }
+    });  
+  }
+  
+  logout() {
+    console.log('logging out');
+    base.unauth();
+    this.setState({
+      uid: null
+    });
+  }
+  
+  authHandler(authData) {  
+    // console.log('authData', authData);
+    // console.log('base', base);
+    
+    const storeRef = firebaseRef.child(this.props.params.storeId);
+    
+    storeRef.on('value', (snapshot) => {
+      var data = snapshot.val() || {};
+      // claim the store as our own if no owner already
+      if(!data.owner) {
+        storeRef.set({
+          owner: authData.user.uid
+        });
+      }
+      // update state to reflect current user & store owner
+      this.setState({
+        uid: authData.user.uid,
+        owner: data.owner || authData.user.uid
+      });
+    });
   }
   
   authenticate(provider) {
-    base.auth().signInWithPopup(provider);
-  }
+    base.auth().signInWithPopup(provider).then((authData) => {
+      this.authHandler(authData);
+    }).catch((error) => {
+      console.log('catch authenticate', error);
+    });
+  }  
   
   renderLogin() {
     return (
@@ -58,16 +113,20 @@ class Inventory extends React.Component {
   }
   
   render() {
-    let logoutButton = <button>Log Out!</button>;
+    let logoutButton = <button onClick={this.logout}>Log Out!</button>;
     
     // check if user is logged in
-    if (!this.state.uui) {
+    if (!this.state.uid) {
       return (
-        <div>{this.renderLogin()}</div>
+        <div>
+          {this.renderLogin()}
+        </div>
       );
     }
     
     // check if user owns the store
+    console.log('this.state.uid', this.state.uid);
+    console.log('this.state.owner', this.state.owner);
     if (this.state.uid !== this.state.owner) {
       return (
         <div>
@@ -96,7 +155,8 @@ Inventory.propTypes = {
   removeFish: React.PropTypes.func.isRequired,
   loadSamples: React.PropTypes.func.isRequired,
   linkState: React.PropTypes.func.isRequired,
-  fishes: React.PropTypes.object.isRequired
+  fishes: React.PropTypes.object.isRequired,
+  params: React.PropTypes.object.isRequired
 };
 
 export default Inventory;

@@ -107,7 +107,8 @@ class App extends React.Component {
                    removeFish={this.removeFish}
                    loadSamples={this.loadSamples}
                    linkState={this.linkState}
-                   fishes={fishes}/>
+                   fishes={fishes}
+                   params={this.props.params}/>
       </div>
     );
   }
