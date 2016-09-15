@@ -20,25 +20,22 @@ class Inventory extends React.Component {
   }
   
   componentWillMount() {
-  
     base.auth().onAuthStateChanged((user) => {
       if (user) {  
         this.setState({
           uid: user.uid,
           owner: this.state.owner || user.uid
         });
-        console.log('User is signed in wow', this.state.uid);
       } else {
         this.setState({
-          uid: null
+          uid: null,
+          owner: null
         });
-        console.log('User is signed out wow', this.state.uid);
       }
     });  
   }
   
   logout() {
-    console.log('logging out');
     base.unauth();
     this.setState({
       uid: null
@@ -48,7 +45,6 @@ class Inventory extends React.Component {
   authHandler(authData) {  
     // console.log('authData', authData);
     // console.log('base', base);
-    
     const storeRef = firebaseRef.child(this.props.params.storeId);
     
     storeRef.on('value', (snapshot) => {
@@ -125,8 +121,6 @@ class Inventory extends React.Component {
     }
     
     // check if user owns the store
-    console.log('this.state.uid', this.state.uid);
-    console.log('this.state.owner', this.state.owner);
     if (this.state.uid !== this.state.owner) {
       return (
         <div>
