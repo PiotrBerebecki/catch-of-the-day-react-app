@@ -8,6 +8,17 @@ class Order extends React.Component {
     this.renderOrder = this.renderOrder.bind(this);
   }
   
+  shouldComponentUpdate(nextProps, nextState) {
+    if (Object.keys(nextProps.order).length > 0) {
+      return true;
+    } else if (Object.keys(nextProps.order).length === 0 &&
+               Object.keys(this.props.order).length > 0) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+  
   renderOrder(key) {
     var fish = this.props.fishes[key];
     var count = this.props.order[key];
@@ -24,7 +35,7 @@ class Order extends React.Component {
         <li key={key}>Sorry, fish no longer available! {removeButton}</li>
       );
     }
-    
+        
     return (
       <li key={key}>
         <span>

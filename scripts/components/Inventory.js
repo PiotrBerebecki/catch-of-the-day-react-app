@@ -21,18 +21,15 @@ class Inventory extends React.Component {
   
   componentWillMount() {
     base.auth().onAuthStateChanged((user) => {
-      if (user) {  
-        this.setState({
-          uid: user.uid,
-          owner: this.state.owner || user.uid
-        });
+      if (user) {     
+        this.authHandler({user});
       } else {
         this.setState({
           uid: null,
           owner: null
         });
       }
-    });  
+    });
   }
   
   logout() {
@@ -67,7 +64,7 @@ class Inventory extends React.Component {
     base.auth().signInWithPopup(provider).then((authData) => {
       this.authHandler(authData);
     }).catch((error) => {
-      console.log('catch authenticate', error);
+      console.log('Authentication error', error);
     });
   }  
   
@@ -110,9 +107,8 @@ class Inventory extends React.Component {
   
   render() {
     let logoutButton = <button onClick={this.logout}>Log Out!</button>;
-    
     // check if user is logged in
-    if (!this.state.uid) {
+    if (this.state.uid === null) {
       return (
         <div>
           {this.renderLogin()}
@@ -130,16 +126,20 @@ class Inventory extends React.Component {
       );
     }
     
+    if (this.state.uid) {
+      return (
+        <div>
+          <h2>Inventory</h2>
+          {logoutButton}
+          {Object.keys(this.props.fishes).map(this.renderInventory)}
+          <AddFishForm {...this.props}/>
+          <button onClick={this.props.loadSamples}>Load Sample Fishes</button>
+        </div>
+      );
+    }
+    
     return (
-      <div>
-        <h2>Inventory</h2>
-        {logoutButton}
-        
-        {Object.keys(this.props.fishes).map(this.renderInventory)}
-        
-        <AddFishForm {...this.props}/>
-        <button onClick={this.props.loadSamples}>Load Sample Fishes</button>
-      </div>
+      <div></div>
     );
   }
 }
