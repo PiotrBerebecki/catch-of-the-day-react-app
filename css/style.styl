@@ -82,15 +82,14 @@ header.top
       transform translateX(-50%) rotateY(10deg) translateX(50%) scale(1.08) translateX(24px)
 
 // Folding Transforms
-// Take off folding when not checked
-input#fold:not(:checked) ~ #main
-  .catch-of-the-day > *
-      transform none
+// Take off folding when not checked  
+input#fold:not(:checked) ~ .catch-of-the-day > *
+  transform none
 
 label[for="fold"]
   position absolute
-  top 1rem
-  left 1rem
+  top 0.5rem
+  left 0.5rem
   text-transform uppercase
   font-size 1.3rem
   background black
@@ -98,12 +97,17 @@ label[for="fold"]
   border 2px solid black
   cursor pointer
   padding 0.5rem 1rem
+  user-select none
 
 input#fold
   display none
   &:checked + label
     background white
     color black
+
+// Inventory
+button#logout-button
+  margin-bottom 2rem
 
 ul
   list-style none
@@ -290,3 +294,5 @@ button, input[type=submit]
     &[type="text"]
       text-align center
       font-size 3rem
+  button
+    width 100%

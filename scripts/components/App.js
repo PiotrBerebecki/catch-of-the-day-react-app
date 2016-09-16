@@ -93,22 +93,29 @@ class App extends React.Component {
   render() {
     var { fishes, order } = this.state;
     return (
-      <div className="catch-of-the-day">
-        <div className="menu">
-          <Header tagline="Fresh Seafood Market"/>
-          <ul className="list-of-fishes">
-            {Object.keys(fishes).map(this.renderFish)}
-          </ul>
+      <div>
+        
+        <input type="checkbox" id="fold"/>
+        <label htmlFor="fold">Fold</label>
+        
+        <div className="catch-of-the-day">
+          <div className="menu">
+            <Header tagline="Fresh Seafood Market"/>
+            <ul className="list-of-fishes">
+              {Object.keys(fishes).map(this.renderFish)}
+            </ul>
+          </div>
+          <Order fishes={fishes}
+                 order={order}
+                 removeFromOrder={this.removeFromOrder}/>
+          <Inventory addFish={this.addFish}
+                     removeFish={this.removeFish}
+                     loadSamples={this.loadSamples}
+                     linkState={this.linkState}
+                     fishes={fishes}
+                     params={this.props.params}/>
         </div>
-        <Order fishes={fishes}
-               order={order}
-               removeFromOrder={this.removeFromOrder}/>
-        <Inventory addFish={this.addFish}
-                   removeFish={this.removeFish}
-                   loadSamples={this.loadSamples}
-                   linkState={this.linkState}
-                   fishes={fishes}
-                   params={this.props.params}/>
+        
       </div>
     );
   }
